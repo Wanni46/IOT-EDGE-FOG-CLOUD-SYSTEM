@@ -1,0 +1,1 @@
+Create and use a virtual environment to run the django project.
