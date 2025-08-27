@@ -854,59 +854,6 @@ docker-compose logs -f
 docker-compose up -d --scale flask-websocket=3
 ```
 
-### ☸️ **Kubernetes Deployment**
-
-```yaml
-# k8s/deployment.yml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: iot-django-web
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: django-web
-  template:
-    metadata:
-      labels:
-        app: django-web
-    spec:
-      containers:
-      - name: django
-        image: iot-system/django:latest
-        ports:
-        - containerPort: 8000
-        env:
-        - name: DATABASE_URL
-          value: "postgresql://user:pass@postgres:5432/iot_db"
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
-```
-
-#### **🎯 Production Deployment Commands**
-
-```bash
-# 🔧 Deploy to Kubernetes
-kubectl apply -f k8s/
-
-# 📊 Monitor deployment
-kubectl get pods -w
-
-# 🔍 Check service status
-kubectl get services
-
-# 📈 Auto-scaling setup
-kubectl autoscale deployment iot-django-web --cpu-percent=70 --min=2 --max=10
-```
-
----
-
 ## 🔒 Security Considerations
 
 ### 🛡️ **Multi-Layer Security Architecture**
@@ -1244,12 +1191,12 @@ SOFTWARE.
 
 #### 🏆 **Community Impact**
 
-** 🌟 Stars**: Growing community recognition
-** 🍴 Forks**: Active development branches
-** 🐛 Issues**: Continuous improvement feedback-
-** 🔄 Pull Requests**: Collaborative enhancements
-** 📚 Documentation**: Community-driven knowledge base
-** 🌍 Global Reach**: International adoption
+- ** 🌟 Stars**: Growing community recognition
+- ** 🍴 Forks**: Active development branches
+- ** 🐛 Issues**: Continuous improvement feedback-
+- ** 🔄 Pull Requests**: Collaborative enhancements
+- ** 📚 Documentation**: Community-driven knowledge base
+- ** 🌍 Global Reach**: International adoption
 
 #### 💝 **Acknowledgment**
 
