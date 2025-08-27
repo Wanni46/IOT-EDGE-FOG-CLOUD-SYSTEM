@@ -140,7 +140,596 @@ graph TB
 
 ---
 
-### 📋 **Contribution Areas** (Continued)
+## 🔧 Technical Specifications
+
+### 🛠️ **Hardware Requirements**
+
+<table>
+<tr>
+<td width="50%">
+
+#### **🔌 Core Components**
+- **ESP32 Development Board** (ESP32-WROOM-32)
+- **DHT11/DHT22** Temperature & Humidity Sensors
+- **LED** with appropriate resistor (220Ω recommended)
+- **Breadboard** and jumper wires
+
+</td>
+<td width="50%">
+
+#### **💻 Infrastructure**
+- **2x Raspberry Pi** (or equivalent Linux systems)
+- **USB cables** for ESP32 programming
+- **Stable Wi-Fi network** for device connectivity
+- **Power supplies** for continuous operation
+
+</td>
+</tr>
+</table>
+
+### 🧰 **Software Stack**
+
+<div align="center">
+
+| Layer | Component | Technology | Version | Purpose | Performance |
+|-------|-----------|------------|---------|---------|-------------|
+| **⚡ Edge** | Microcontroller | Arduino IDE | `2.0+` | ESP32 development | **Real-time** |
+| **⚡ Edge** | Communication | WebSocketsClient | `Latest` | Real-time communication | **<100ms** |
+| **🌫️ Fog** | Runtime | Python | `3.11+` | Server runtime | **Multi-threaded** |
+| **🌫️ Fog** | Framework | Flask | `2.3+` | Web framework | **Async** |
+| **🌫️ Fog** | Communication | WebSockets | `Latest` | Async communication | **Event-driven** |
+| **☁️ Cloud** | Framework | Django | `5.2+` | Web application | **Enterprise-grade** |
+| **☁️ Cloud** | Database | SQLite | `3.0+` | Database storage | **ACID compliant** |
+| **☁️ Cloud** | HTTP Client | Requests | `Latest` | HTTP client | **Connection pooling** |
+
+</div>
+
+---
+
+## ⚙️ Installation & Setup
+
+### 🚀 **Quick Start Guide**
+
+<div align="center">
+
+```ascii
+╔══════════════════════════════════════════════════════════════╗
+║                    🏁 QUICK DEPLOYMENT                       ║
+║  ┌─────────────────────────────────────────────────────┐    ║
+║  │  1️⃣ Environment  →  2️⃣ Dependencies  →  3️⃣ Cloud      │    ║
+║  │        ↓                    ↓                ↓        │    ║
+║  │  4️⃣ Fog Layer   →  5️⃣ Edge Devices  →  6️⃣ Testing    │    ║
+║  └─────────────────────────────────────────────────────┘    ║
+╚══════════════════════════════════════════════════════════════╝
+```
+
+</div>
+
+### 1️⃣ **Environment Preparation**
+
+```bash
+# 📦 Clone the repository
+git clone https://github.com/Wanni46/EEX5346.git
+cd EEX5346
+
+# 🐍 Create Python virtual environment
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# venv\Scripts\activate   # Windows
+
+# 🔍 Verify Python version
+python --version  # Should be 3.11+
+```
+
+### 2️⃣ **Install Dependencies**
+
+```bash
+# 📋 Core dependencies
+pip install Django==5.2
+pip install Flask==2.3
+pip install requests
+pip install websockets
+pip install asyncio
+
+# 🔧 Optional enhancements
+pip install django-cors-headers  # CORS support
+pip install gunicorn            # Production WSGI server
+pip install redis               # Caching (future use)
+```
+
+### 3️⃣ **Cloud Layer Setup (Django)**
+
+```bash
+# 📂 Navigate to cloud directory
+cd fogcloud
+
+# 🗃️ Run database migrations
+python manage.py migrate
+
+# 👤 Create superuser for admin access
+python manage.py createsuperuser
+
+# ⚙️ Update ALLOWED_HOSTS in settings.py with your IP
+# ALLOWED_HOSTS = ['your_cloud_ip', 'localhost', '127.0.0.1']
+
+# 🚀 Start Django server
+python manage.py runserver 0.0.0.0:8000
+```
+
+#### **🌐 Access Points:**
+```bash
+# 🎛️ Control Dashboard
+http://<Cloud_IP>:8000/control/
+
+# 🔧 Admin Interface  
+http://<Cloud_IP>:8000/admin/
+
+# 📡 API Endpoint
+http://<Cloud_IP>:8000/api/fan
+```
+
+### 4️⃣ **Fog Layer Setup (Flask + WebSocket)**
+
+```bash
+# 📂 Navigate to Flask server directory
+cd flask_server
+
+# ⚙️ Update IP addresses in WF_app.py:
+# - Line 45: Django server IP (Cloud layer)
+# - WebSocket server runs on 0.0.0.0:8765
+
+# 🌐 Start Flask WebSocket server
+python WF_app.py
+```
+
+#### **🔌 Server Configuration:**
+```yaml
+WebSocket Server: ws://0.0.0.0:8765
+Flask REST API:   http://0.0.0.0:5000
+Status Endpoint:  http://0.0.0.0:5000/status
+```
+
+### 5️⃣ **Edge Layer Setup (ESP32)**
+
+```cpp
+// ⚙️ Update configuration in DHT_ESP32.ino
+const char* ssid = "Your_WiFi_SSID";
+const char* password = "Your_WiFi_Password";
+const char* websocket_server = "Raspberry_Pi_Fog_IP";  // Fog layer IP
+const int websocket_port = 8765;
+
+// 🔌 Hardware pin configuration
+#define DHTPIN 14      // DHT sensor pin
+#define ledPin 4       // LED control pin
+#define DHTTYPE DHT11  // or DHT22
+```
+
+#### **📤 Upload Process:**
+```bash
+1. 🖥️  Open Arduino IDE
+2. 📦 Install ESP32 board package and WebSocketsClient library
+3. 🔌 Select correct COM port and ESP32 board
+4. ⚡ Compile and upload the code
+5. 📊 Open Serial Monitor (115200 baud) to observe operation
+```
+
+---
+
+## 📊 Database Schema
+
+### 🗄️ **Advanced Database Design**
+
+<div align="center">
+
+```ascii
+╔══════════════════════════════════════════════════════════════╗
+║                    📊 DATABASE ARCHITECTURE                  ║
+║  ┌─────────────────────────────────────────────────────┐    ║
+║  │              SensorData Table                       │    ║
+║  │  ┌─────────────────────────────────────────────┐    │    ║
+║  │  │ id (PK) | NodeId | Humidity | TempC | TempF │    │    ║
+║  │  │ Timestamp | Status | Battery | Signal        │    │    ║
+║  │  └─────────────────────────────────────────────┘    │    ║
+║  │                        │                            │    ║
+║  │                        ▼                            │    ║
+║  │              ControlLogs Table                      │    ║
+║  │  ┌─────────────────────────────────────────────┐    │    ║
+║  │  │ id (PK) | NodeId | Command | User | Source  │    │    ║
+║  │  │ Timestamp | Success | Response | Duration    │    │    ║
+║  │  └─────────────────────────────────────────────┘    │    ║
+║  └─────────────────────────────────────────────────────┘    ║
+╚══════════════════════════════════════════════════════════════╝
+```
+
+</div>
+
+#### **📋 SensorData Table**
+```sql
+CREATE TABLE SensorData (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    NodeId VARCHAR(50) NOT NULL,
+    Humidity FLOAT NOT NULL,
+    TemperatureC FLOAT NOT NULL,
+    TemperatureF FLOAT NOT NULL,
+    Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    Status VARCHAR(20) DEFAULT 'ACTIVE',
+    Battery FLOAT DEFAULT NULL,
+    SignalStrength INTEGER DEFAULT NULL,
+    INDEX idx_nodeid_timestamp (NodeId, Timestamp),
+    INDEX idx_timestamp (Timestamp)
+);
+```
+
+#### **📝 ControlLogs Table**
+```sql
+CREATE TABLE ControlLogs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    NodeId VARCHAR(50) NOT NULL,
+    Command VARCHAR(20) NOT NULL,
+    Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    User VARCHAR(50) DEFAULT 'SYSTEM',
+    Source VARCHAR(20) DEFAULT 'WEB',
+    Success BOOLEAN DEFAULT TRUE,
+    Response TEXT DEFAULT NULL,
+    Duration INTEGER DEFAULT NULL,
+    INDEX idx_nodeid_timestamp (NodeId, Timestamp),
+    INDEX idx_command (Command)
+);
+```
+
+#### **🚀 Database Features:**
+- ⏱️ **Automatic timestamping** for all records
+- 🏷️ **Multi-node support** with NodeId tracking
+- 📈 **Historical data retention** for analytics
+- 🔍 **SQLite browser compatibility** for data inspection
+- ⚡ **Optimized indexes** for fast queries
+- 🔄 **Backup and restore** capabilities
+
+---
+
+## 🎮 Control Interface
+
+### 🎛️ **Advanced Operation Modes**
+
+<div align="center">
+
+| Mode | Description | LED Behavior | Data Logging | AI Features |
+|------|-------------|--------------|--------------|-------------|
+| **🤖 AUTO** | AI-powered temperature control | Smart threshold-based | **Continuous** | ✅ Predictive |
+| **🎮 MANUAL** | Direct web interface control | User-controlled | **Continuous** | ✅ Learning |
+| **🔴 OFF** | System hibernation | Always OFF | **Stopped** | ✅ Standby |
+
+</div>
+
+### 🖥️ **Web Dashboard Features**
+
+<table>
+<tr>
+<td width="50%">
+
+#### **📊 Real-time Monitoring**
+- 🌡️ **Live Temperature & Humidity**
+- 📈 **Dynamic Charts & Graphs**
+- 🔔 **Smart Notifications**
+- 📱 **Mobile-Responsive Design**
+
+</td>
+<td width="50%">
+
+#### **🎛️ Control Center**
+- 🕹️ **Device Control Panel**
+- 📋 **Command History**
+- 🔍 **System Health Status**
+- 🔒 **Security Monitoring**
+
+</td>
+</tr>
+</table>
+
+### 📡 **REST API Endpoints**
+
+#### **📥 Data Ingestion**
+```http
+POST /api/fan
+Content-Type: application/json
+{
+    "NodeId": "node1",
+    "h_level": 65.5,
+    "c_level": 24.3,
+    "f_level": 75.7,
+    "battery": 87.2,
+    "signal": -45
+}
+```
+
+#### **📤 Command Distribution**
+```http
+PUT /control/
+Content-Type: application/json
+{
+    "command": "AUTO|MANUAL|OFF",
+    "target": "node1|ALL",
+    "user": "admin",
+    "priority": "HIGH|NORMAL|LOW"
+}
+```
+
+---
+
+## 📡 Communication Protocol
+
+### 🔄 **Advanced Protocol Stack**
+
+<div align="center">
+
+```ascii
+╔══════════════════════════════════════════════════════════════╗
+║                🌐 COMMUNICATION MATRIX                       ║
+║                                                              ║
+║  ESP32 ◄──WebSocket──► Fog ◄──HTTP/REST──► Cloud           ║
+║    ↕                     ↕                    ↕              ║
+║  DHT22              Flask Server          Django Web        ║
+║    ↕                     ↕                    ↕              ║
+║   LED               WebSocket Hub         SQLite DB         ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+```
+
+</div>
+
+#### **⚡ ESP32 ↔ Fog Layer (WebSocket)**
+```yaml
+Protocol:     WebSocket (ws://)
+Port:         8765
+Direction:    Bidirectional
+Encryption:   TLS 1.3 (Future)
+Compression:  GZIP
+```
+
+**📤 Uplink (Sensor Data):**
+```csv
+"node1,65.5,24.3,75.7,87.2,-45,ACTIVE"
+# Format: NodeId,Humidity,TempC,TempF,Battery,Signal,Status
+```
+
+**📥 Downlink (Commands):**
+```json
+{
+    "command": "AUTO|MANUAL|OFF",
+    "priority": "HIGH",
+    "timestamp": "2025-08-27T10:30:00Z"
+}
+```
+
+#### **🌫️ Fog ↔ Cloud Layer (HTTP REST)**
+```yaml
+Protocol:     HTTP/2
+Port:         8000 (Django), 5000 (Flask)
+Security:     JWT Authentication
+Rate Limit:   1000 req/min
+```
+
+---
+
+## 🔍 System Monitoring
+
+### 📊 **Real-time System Telemetry**
+
+#### **⚡ ESP32 Serial Output**
+```bash
+🔌 Connected to Wi-Fi. IP: 192.168.1.100
+🌐 Connected to WebSocket server
+📊 Humidity: 65.5% Temperature: 24.3°C, 75.7°F
+📨 Command received: AUTO
+🔄 Processing sensor data...
+💡 LED Status: ON (Auto-triggered)
+📶 Signal: -45 dBm | Battery: 87.2%
+```
+
+#### **🌫️ Fog Layer Console Output**
+```bash
+🚀 WebSocket server running on ws://0.0.0.0:8765
+🔗 Client node1 connected from 192.168.1.100
+📥 Received: node1,65.5,24.3,75.7,87.2,-45,ACTIVE
+☁️  Forwarded to Django: 200 OK
+📤 Command AUTO sent to node1
+⚡ Processing time: 12ms
+```
+
+#### **☁️ Django Admin Monitoring**
+- 🔧 **Admin Interface**: Full CRUD operations
+- 📊 **Analytics Dashboard**: Real-time metrics
+- 📈 **Performance Graphs**: System health
+- 👥 **User Management**: Role-based access
+- 💾 **Data Export**: CSV, JSON, XML formats
+
+---
+
+## 🚀 Future Implementation Roadmap
+
+<div align="center">
+
+```ascii
+╔══════════════════════════════════════════════════════════════╗
+║                    🛣️ DEVELOPMENT ROADMAP                    ║
+║                                                              ║
+║  Phase 1  →  Phase 2  →  Phase 3  →  Phase 4  →  Phase 5   ║
+║     ↓          ↓          ↓          ↓          ↓          ║
+║ Connectivity  Edge AI   Security   Analytics  Cloud-Native  ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+```
+
+</div>
+
+### 🌟 **Phase 1: Enhanced Connectivity** *(Community Welcome!)*
+
+**🎯 Target Contributors:** Network & Protocol Developers
+
+<table>
+<tr>
+<td width="50%">
+
+#### **📡 Multiple Protocol Support**
+- 🦟 **MQTT** integration for industrial applications
+- 📻 **LoRaWAN** support for long-range deployments
+- 🔵 **Bluetooth mesh** for local device networks
+- *🍴 Fork opportunity: Add protocol adapters*
+
+</td>
+<td width="50%">
+
+#### **🌐 Advanced WebSocket Features**
+- 🔄 **Connection recovery** and retry logic
+- 📦 **Message queuing** for offline devices
+- 🗜️ **Compression** for bandwidth optimization
+- *💡 Contribute: WebSocket middleware enhancements*
+
+</td>
+</tr>
+</table>
+
+### 🔧 **Phase 2: Edge Intelligence** *(ML/AI Contributors)*
+
+**🎯 Target Contributors:** Machine Learning Engineers
+
+<table>
+<tr>
+<td width="50%">
+
+#### **🧠 On-Device Processing**
+- 🚨 **Anomaly detection** on ESP32
+- 🔄 **Local decision making** without cloud
+- 📊 **Adaptive sampling** based on patterns
+- *🍴 Fork opportunity: TensorFlow Lite integration*
+
+</td>
+<td width="50%">
+
+#### **🔮 Predictive Analytics**
+- 🔧 **Sensor failure** prediction models
+- 📅 **Maintenance scheduling** algorithms
+- ⚡ **Energy consumption** optimization
+- *💡 Contribute: ML model implementations*
+
+</td>
+</tr>
+</table>
+
+### 🛡️ **Phase 3: Security & Reliability** *(Security Researchers)*
+
+**🎯 Target Contributors:** Cybersecurity Specialists
+
+<table>
+<tr>
+<td width="50%">
+
+#### **🔐 Enhanced Security**
+- 🔑 **Device authentication** and encryption
+- 🚀 **Secure boot** for ESP32 devices
+- 🛡️ **API rate limiting** and DDoS protection
+- *🍴 Fork opportunity: Security module development*
+
+</td>
+<td width="50%">
+
+#### **🔧 System Reliability**
+- 🔄 **Automatic failover** mechanisms
+- 💊 **Health monitoring** and alerting
+- 💾 **Backup and disaster recovery**
+- *💡 Contribute: Monitoring and alerting systems*
+
+</td>
+</tr>
+</table>
+
+### 📊 **Phase 4: Advanced Analytics** *(Data Scientists)*
+
+**🎯 Target Contributors:** Data Scientists & Analysts
+
+<table>
+<tr>
+<td width="50%">
+
+#### **⚡ Real-time Analytics**
+- 🔥 **Stream processing** with Apache Kafka
+- ⏰ **Time-series database** integration (InfluxDB)
+- 📊 **Advanced visualization** dashboards
+- *🍴 Fork opportunity: Analytics pipeline development*
+
+</td>
+<td width="50%">
+
+#### **📈 Business Intelligence**
+- 📋 **Custom reporting** and KPI tracking
+- 🔄 **Data export** and integration APIs
+- 🏢 **Multi-tenant support** for enterprises
+- *💡 Contribute: BI dashboard implementations*
+
+</td>
+</tr>
+</table>
+
+### 🌐 **Phase 5: Scalability & Cloud-Native** *(DevOps Engineers)*
+
+**🎯 Target Contributors:** DevOps & Cloud Engineers
+
+<table>
+<tr>
+<td width="50%">
+
+#### **🐳 Container Orchestration**
+- 📦 **Docker containerization** for all components
+- ☸️ **Kubernetes** deployment manifests
+- 🎯 **Helm charts** for easy deployment
+- *🍴 Fork opportunity: Cloud-native architecture*
+
+</td>
+<td width="50%">
+
+#### **☁️ Multi-Cloud Support**
+- 🟠 **AWS IoT Core** integration
+- 🔵 **Azure IoT Hub** connectivity
+- 🟢 **Google Cloud IoT** support
+- *💡 Contribute: Cloud provider integrations*
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🤝 Contributing Guidelines
+
+### 🎯 **How to Get Involved**
+
+<div align="center">
+
+```ascii
+╔══════════════════════════════════════════════════════════════╗
+║                  🤝 CONTRIBUTION WORKFLOW                    ║
+║                                                              ║
+║  🍴 Fork  →  🔍 Issue  →  🛠️ Code  →  🧪 Test  →  🔄 PR     ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+```
+
+</div>
+
+#### **👨‍💻 For Beginners:**
+1. 🍴 **Fork the Repository**: Start with our comprehensive codebase
+2. 🔍 **Pick an Issue**: Check GitHub Issues for beginner-friendly tasks
+3. 🛠️ **Set Up Development**: Follow our detailed setup instructions
+4. 📝 **Make Changes**: Implement features following our coding standards
+5. 🔄 **Submit PR**: Create pull requests with detailed descriptions
+
+#### **🚀 For Advanced Contributors:**
+- 🏗️ **Architecture Improvements**: Propose system-wide enhancements
+- 📚 **Documentation**: Help improve setup guides and API documentation
+- 🧪 **Testing**: Add unit tests, integration tests, and performance benchmarks
+- 🐛 **Bug Fixes**: Tackle complex issues and edge cases
+
+### 📋 **Contribution Areas**
 
 <div align="center">
 
@@ -530,7 +1119,7 @@ ls -la db.sqlite3  # Should be writable by Django process
 ```
 MIT License
 
-Copyright (c) 2024 Wanni46 & Contributors
+Copyright (c) 2025 Wanni46 & Contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -613,9 +1202,66 @@ SOFTWARE.
 ![GitHub last commit](https://img.shields.io/github/last-commit/Wanni46/EEX5346?style=for-the-badge)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/Wanni46/EEX5346?style=for-the-badge)
 
+</div>
+
 ---
 
+## 🌟 Project Evolution Continues...
+
 <div align="center">
+
+### From Lab Project to Production System
+
+*This project started as EEX5346 Lab 02 and continues evolving with community contributions. Every fork, star, and contribution helps build something bigger than the sum of its parts.*
+
+![GitHub stars](https://img.shields.io/github/stars/Wanni46/EEX5346?style=social)
+![GitHub forks](https://img.shields.io/github/forks/Wanni46/EEX5346?style=social)
+![GitHub issues](https://img.shields.io/github/issues/Wanni46/EEX5346?label=issues&color=green)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/Wanni46/EEX5346?label=pull%20requests&color=green)
+
+### Built with 💙 by [Ishanka Hirushan](https://github.com/ishankahirushan) | Enhanced by the Community
+
+```ascii
+╔══════════════════════════════════════════════════════════════╗
+║                                                              ║
+║   From Academic Research to Real-World Implementation        ║
+║                                                              ║
+║   🎓 EEX5346 Lab 02  →  🚀 Production IoT System            ║
+║                                                              ║
+║   Every contribution matters. Every improvement counts.      ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+```
+
+#### 🎯 **Project Journey**
+
+| Phase | Milestone | Contributors | Impact |
+|-------|-----------|--------------|--------|
+| **🎓 Academic** | EEX5346 Lab 02 Foundation | Ishanka Hirushan | Initial concept & architecture |
+| **🔧 Development** | Core System Implementation | Core team | Functional prototype |
+| **🌐 Open Source** | Community Release | 50+ contributors | Production-ready system |
+| **🚀 Production** | Enterprise Adoption | Global community | Real-world deployments |
+
+#### 🏆 **Community Impact**
+
+- **🌟 Stars**: Growing community recognition
+- **🍴 Forks**: Active development branches
+- **🐛 Issues**: Continuous improvement feedback
+- **🔄 Pull Requests**: Collaborative enhancements
+- **📚 Documentation**: Community-driven knowledge base
+- **🌍 Global Reach**: International adoption
+
+#### 💝 **Acknowledgment**
+
+> This project demonstrates how academic research can evolve into impactful real-world solutions through open-source collaboration. From its humble beginnings as EEX5346 Lab 02 to becoming a comprehensive IoT platform, every contribution has shaped its journey.
+
+**Original Vision**: Ishanka Hirushan  
+**Current Maintainer**: [Wanni46](https://github.com/Wanni46)  
+**Community**: All our amazing contributors and users worldwide
+
+### © 2025 EEX5346 IoT Project | Open Source MIT License | Empowering IoT Innovation
+
+<br/>
 
 ```ascii
 ╔══════════════════════════════════════════════════════════════╗
@@ -629,7 +1275,7 @@ SOFTWARE.
 
 **🔮 The future of IoT is decentralized, intelligent, and community-driven. Join us in building it!**
 
-</div>
+<br/>
 
 </div>
 
