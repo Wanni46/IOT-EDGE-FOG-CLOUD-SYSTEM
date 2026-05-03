@@ -1031,7 +1031,7 @@ SOFTWARE.
 ![GitHub issues](https://img.shields.io/github/issues/Wanni46/EEX5346?label=issues&color=green)
 ![GitHub pull requests](https://img.shields.io/github/issues-pr/Wanni46/EEX5346?label=pull%20requests&color=green)
 
-### Built with 💙 by [Ishanka Hirushan](https://github.com/ishankahirushan) | Enhanced by the Community
+### Built with 💙 by [Pasindu D. Wanninayake](https://github.com/wanni46) | Enhanced by the Community
 
 ```ascii
 ╔══════════════════════════════════════════════════════════════╗
