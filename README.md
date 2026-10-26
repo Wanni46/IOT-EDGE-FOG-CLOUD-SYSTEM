@@ -1049,7 +1049,7 @@ SOFTWARE.
 
 | Phase | Milestone | Contributors | Impact |
 |-------|-----------|--------------|--------|
-| **🎓 Academic** | EEX5346 Lab 02 Foundation | Ishanka Hirushan | Initial concept & architecture |
+| **🎓 Academic** | EEX5346 Lab 02 Foundation | Pasindu Dhananjaya Wanninayake | Initial concept & architecture |
 | **🔧 Development** | Core System Implementation | Core team | Functional prototype |
 | **🌐 Open Source** | Community Release | 50+ contributors | Production-ready system |
 | **🚀 Production** | Enterprise Adoption | Global community | Real-world deployments |
